@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Snack Shack</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>The Snack Shack</h1>
+  </header>
+
+  <main class="shop-layout">
+    <section class="sale-info" aria-label="Sale time and location">
+      <div>
+        <strong>Where</strong>
+        <span>Cafeteria snack table, next to the vending machines</span>
+      </div>
+      <div>
+        <strong>When</strong>
+        <span>Monday-Friday, lunch time, 12:10 PM-12:40 PM</span>
+      </div>
+    </section>
+
+    <section class="menu-grid" aria-label="Snack menu">
+      <button class="snack-card" data-name="Chips" data-price="1.25" aria-label="Add chips for $1.25">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Potato-Chips.jpg?width=900" alt="A pile of potato chips">
+        </span>
+        <span class="item-row"><span>Chips</span><span class="price">$1.25</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Cookies" data-price="1.50" aria-label="Add cookies for $1.50">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/A%20cookie%20plate.jpg?width=900" alt="Cookies on a plate">
+        </span>
+        <span class="item-row"><span>Cookies</span><span class="price">$1.50</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Chocolate" data-price="1.75" aria-label="Add chocolate for $1.75">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Chocolate%20bar.png?width=900" alt="A chocolate bar">
+        </span>
+        <span class="item-row"><span>Chocolate</span><span class="price">$1.75</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Popcorn" data-price="1.00" aria-label="Add popcorn for $1.00">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Popcorn%20NIH.jpg?width=900" alt="Bowls of popcorn">
+        </span>
+        <span class="item-row"><span>Popcorn</span><span class="price">$1.00</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Fruit Gummies" data-price="1.25" aria-label="Add fruit gummies for $1.25">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Gummy%20bears.jpg?width=900" alt="Colorful gummy bears">
+        </span>
+        <span class="item-row"><span>Gummies</span><span class="price">$1.25</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Granola Bar" data-price="1.50" aria-label="Add granola bar for $1.50">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Chewy-Granola-Bar.jpg?width=900" alt="A granola bar">
+        </span>
+        <span class="item-row"><span>Granola Bar</span><span class="price">$1.50</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Crackers" data-price="1.00" aria-label="Add crackers for $1.00">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Crackers.jpg?width=900" alt="Round crackers">
+        </span>
+        <span class="item-row"><span>Crackers</span><span class="price">$1.00</span></span>
+      </button>
+
+      <button class="snack-card" data-name="Apple Juice" data-price="1.25" aria-label="Add apple juice for $1.25">
+        <span class="photo-frame">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/NFC%20100%25%20Apple%20Juice.jpg?width=900" alt="Apple juice bottle">
+        </span>
+        <span class="item-row"><span>Apple Juice</span><span class="price">$1.25</span></span>
+      </button>
+    </section>
+
+    <aside class="order-panel" aria-live="polite">
+      <div class="machine-top">
+        <p class="screen-title">Your order</p>
+        <p class="screen-total">$0.00</p>
+      </div>
+
+      <div class="order-list" id="orderItems">
+        <p class="empty-order">Tap snacks to add them here.</p>
+      </div>
+
+      <button type="button" id="clearOrder" class="clear-order">Clear order</button>
+
+      <div class="pickup-tray">
+        <div class="snack-bag" id="snackBag">Pay Mia in person</div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
