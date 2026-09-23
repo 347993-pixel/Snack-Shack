@@ -204,6 +204,12 @@ h1 {
   text-align: left;
 }
 
+.eco-label.no-points {
+  border-color: #b13a00;
+  color: #5b1c00;
+  background: linear-gradient(135deg, #ffd1a8, #ff9f7a);
+}
+
 .order-panel {
   position: sticky;
   top: 16px;
