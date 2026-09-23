@@ -242,7 +242,7 @@ h1 {
 
 .account-box div {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(92px, 0.75fr) auto;
   gap: 8px;
 }
 

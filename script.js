@@ -1,6 +1,7 @@
 const snackCards = document.querySelectorAll(".snack-card");
 const accountForm = document.querySelector("#accountForm");
 const studentNameInput = document.querySelector("#studentName");
+const studentIdInput = document.querySelector("#studentId");
 const accountMessage = document.querySelector("#accountMessage");
 const clearButton = document.querySelector("#clearOrder");
 const savePointsButton = document.querySelector("#savePoints");
@@ -24,7 +25,7 @@ const mysteryPrizes = [
   "a free mystery topping",
   "a thank-you note from The Snack Shack"
 ];
-let activeAccount = localStorage.getItem(activeAccountKey) || "";
+let activeAccount = loadActiveAccount();
 
 function money(value) {
   return `$${value.toFixed(2)}`;
@@ -34,12 +35,36 @@ function cleanName(name) {
   return name.trim().replace(/\s+/g, " ");
 }
 
+function cleanId(id) {
+  return id.trim().replace(/\s+/g, "");
+}
+
+function loadActiveAccount() {
+  const saved = localStorage.getItem(activeAccountKey);
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    const account = JSON.parse(saved);
+
+    if (account && account.name && account.id) {
+      return account;
+    }
+  } catch (error) {
+    return null;
+  }
+
+  return null;
+}
+
 function getAccountKey() {
-  return `${rewardsPrefix}${activeAccount.toLowerCase()}`;
+  return `${rewardsPrefix}${activeAccount.id}`;
 }
 
 function hasAccount() {
-  return activeAccount.length > 0;
+  return Boolean(activeAccount && activeAccount.id);
 }
 
 function getSavedPoints() {
@@ -142,25 +167,32 @@ function updateOrderPanel() {
   updateRewardButtons();
 }
 
-function setActiveAccount(name) {
-  activeAccount = cleanName(name);
+function setActiveAccount(name, id) {
+  const cleanAccountName = cleanName(name);
+  const cleanAccountId = cleanId(id);
 
-  if (!hasAccount()) {
+  if (!cleanAccountName || !cleanAccountId) {
     return false;
   }
 
-  localStorage.setItem(activeAccountKey, activeAccount);
-  studentNameInput.value = activeAccount;
-  accountMessage.textContent = `Account ready for ${activeAccount}. These points are personal.`;
-  rewardMessage.textContent = `${activeAccount}, choose snacks to earn your own eco points.`;
+  activeAccount = {
+    name: cleanAccountName,
+    id: cleanAccountId
+  };
+
+  localStorage.setItem(activeAccountKey, JSON.stringify(activeAccount));
+  studentNameInput.value = activeAccount.name;
+  studentIdInput.value = activeAccount.id;
+  accountMessage.textContent = `Account ready for ${activeAccount.name} (#${activeAccount.id}). These points are personal.`;
+  rewardMessage.textContent = `${activeAccount.name}, choose snacks to earn your own eco points.`;
   updateOrderPanel();
   return true;
 }
 
 function addSnack(card) {
   if (!hasAccount()) {
-    rewardMessage.textContent = "Please enter your name before buying snacks.";
-    accountMessage.textContent = "Your name is needed so points do not mix with other students.";
+    rewardMessage.textContent = "Please enter your name and student ID before buying snacks.";
+    accountMessage.textContent = "Your student ID is needed so points do not mix with other students.";
     studentNameInput.focus();
     return;
   }
@@ -207,7 +239,7 @@ function saveOrderPoints() {
 
   setSavedPoints(getSavedPoints() + points);
   order.clear();
-  rewardMessage.textContent = `${points} eco points saved for ${activeAccount}. Thanks for choosing greener packaging.`;
+  rewardMessage.textContent = `${points} eco points saved for ${activeAccount.name}. Thanks for choosing greener packaging.`;
   updateOrderPanel();
 }
 
@@ -230,15 +262,15 @@ snackCards.forEach((card) => {
 accountForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  if (!setActiveAccount(studentNameInput.value)) {
-    accountMessage.textContent = "Please type your name to start a personal points account.";
+  if (!setActiveAccount(studentNameInput.value, studentIdInput.value)) {
+    accountMessage.textContent = "Please type your name and student ID to start a personal points account.";
   }
 });
 
 clearButton.addEventListener("click", () => {
   order.clear();
   rewardMessage.textContent = hasAccount()
-    ? `Order cleared. ${activeAccount}'s saved points stayed safe.`
+    ? `Order cleared. ${activeAccount.name}'s saved points stayed safe.`
     : "Order cleared.";
   updateOrderPanel();
 });
@@ -257,8 +289,9 @@ freeSnackButton.addEventListener("click", () => {
 updateOrderPanel();
 
 if (hasAccount()) {
-  studentNameInput.value = activeAccount;
-  accountMessage.textContent = `Account ready for ${activeAccount}. These points are personal.`;
-  rewardMessage.textContent = `${activeAccount}, your saved points are loaded.`;
+  studentNameInput.value = activeAccount.name;
+  studentIdInput.value = activeAccount.id;
+  accountMessage.textContent = `Account ready for ${activeAccount.name} (#${activeAccount.id}). These points are personal.`;
+  rewardMessage.textContent = `${activeAccount.name}, your saved points are loaded.`;
   updateOrderPanel();
 }
