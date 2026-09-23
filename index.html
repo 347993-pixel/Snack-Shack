@@ -98,6 +98,15 @@
     </section>
 
     <aside class="order-panel" aria-live="polite">
+      <form class="account-box" id="accountForm">
+        <label for="studentName">Student name</label>
+        <div>
+          <input type="text" id="studentName" name="studentName" autocomplete="name" placeholder="Type your name" required>
+          <button type="submit">Start</button>
+        </div>
+        <p id="accountMessage">Enter your name before buying snacks so points save to your account.</p>
+      </form>
+
       <div class="machine-top">
         <p class="screen-title">Your order</p>
         <p class="screen-total">$0.00</p>

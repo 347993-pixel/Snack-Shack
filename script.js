@@ -1,4 +1,7 @@
 const snackCards = document.querySelectorAll(".snack-card");
+const accountForm = document.querySelector("#accountForm");
+const studentNameInput = document.querySelector("#studentName");
+const accountMessage = document.querySelector("#accountMessage");
 const clearButton = document.querySelector("#clearOrder");
 const savePointsButton = document.querySelector("#savePoints");
 const mysteryDrawButton = document.querySelector("#mysteryDraw");
@@ -12,7 +15,8 @@ const orderItems = document.querySelector("#orderItems");
 const snackBag = document.querySelector("#snackBag");
 
 const order = new Map();
-const rewardsKey = "snackShackEcoPoints";
+const activeAccountKey = "snackShackActiveAccount";
+const rewardsPrefix = "snackShackEcoPoints:";
 const mysteryPrizes = [
   "a bonus sticker",
   "first pick from the snack table",
@@ -20,17 +24,38 @@ const mysteryPrizes = [
   "a free mystery topping",
   "a thank-you note from The Snack Shack"
 ];
+let activeAccount = localStorage.getItem(activeAccountKey) || "";
 
 function money(value) {
   return `$${value.toFixed(2)}`;
 }
 
+function cleanName(name) {
+  return name.trim().replace(/\s+/g, " ");
+}
+
+function getAccountKey() {
+  return `${rewardsPrefix}${activeAccount.toLowerCase()}`;
+}
+
+function hasAccount() {
+  return activeAccount.length > 0;
+}
+
 function getSavedPoints() {
-  return Number(localStorage.getItem(rewardsKey)) || 0;
+  if (!hasAccount()) {
+    return 0;
+  }
+
+  return Number(localStorage.getItem(getAccountKey())) || 0;
 }
 
 function setSavedPoints(points) {
-  localStorage.setItem(rewardsKey, String(Math.max(points, 0)));
+  if (!hasAccount()) {
+    return;
+  }
+
+  localStorage.setItem(getAccountKey(), String(Math.max(points, 0)));
 }
 
 function getOrderTotal() {
@@ -57,8 +82,8 @@ function updateRewardButtons() {
   const points = getSavedPoints();
 
   savedPoints.textContent = points;
-  mysteryDrawButton.disabled = points < 100;
-  freeSnackButton.disabled = points < 200;
+  mysteryDrawButton.disabled = !hasAccount() || points < 100;
+  freeSnackButton.disabled = !hasAccount() || points < 200;
 }
 
 function updateOrderPanel() {
@@ -69,11 +94,13 @@ function updateOrderPanel() {
   screenTitle.textContent = totalItems === 1 ? "1 snack selected" : `${totalItems} snacks selected`;
   screenTotal.textContent = money(total);
   orderPoints.textContent = `${points} eco points`;
-  savePointsButton.disabled = points === 0;
+  savePointsButton.disabled = !hasAccount() || points === 0;
 
   if (order.size === 0) {
-    orderItems.innerHTML = '<p class="empty-order">Tap snacks to add them here.</p>';
-    snackBag.textContent = "Pay Mia in person";
+    orderItems.innerHTML = hasAccount()
+      ? '<p class="empty-order">Tap snacks to add them here.</p>'
+      : '<p class="empty-order">Enter your name first, then tap snacks.</p>';
+    snackBag.textContent = hasAccount() ? "Pay Mia in person" : "Start with your name";
     updateRewardButtons();
     return;
   }
@@ -115,7 +142,29 @@ function updateOrderPanel() {
   updateRewardButtons();
 }
 
+function setActiveAccount(name) {
+  activeAccount = cleanName(name);
+
+  if (!hasAccount()) {
+    return false;
+  }
+
+  localStorage.setItem(activeAccountKey, activeAccount);
+  studentNameInput.value = activeAccount;
+  accountMessage.textContent = `Account ready for ${activeAccount}. These points are personal.`;
+  rewardMessage.textContent = `${activeAccount}, choose snacks to earn your own eco points.`;
+  updateOrderPanel();
+  return true;
+}
+
 function addSnack(card) {
+  if (!hasAccount()) {
+    rewardMessage.textContent = "Please enter your name before buying snacks.";
+    accountMessage.textContent = "Your name is needed so points do not mix with other students.";
+    studentNameInput.focus();
+    return;
+  }
+
   const name = card.dataset.name;
   const price = Number(card.dataset.price);
   const points = Number(card.dataset.points);
@@ -152,13 +201,13 @@ function changeQuantity(name, amount) {
 function saveOrderPoints() {
   const points = getOrderPoints();
 
-  if (points === 0) {
+  if (!hasAccount() || points === 0) {
     return;
   }
 
   setSavedPoints(getSavedPoints() + points);
   order.clear();
-  rewardMessage.textContent = `${points} eco points saved. Thanks for choosing greener packaging.`;
+  rewardMessage.textContent = `${points} eco points saved for ${activeAccount}. Thanks for choosing greener packaging.`;
   updateOrderPanel();
 }
 
@@ -178,9 +227,19 @@ snackCards.forEach((card) => {
   card.addEventListener("click", () => addSnack(card));
 });
 
+accountForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (!setActiveAccount(studentNameInput.value)) {
+    accountMessage.textContent = "Please type your name to start a personal points account.";
+  }
+});
+
 clearButton.addEventListener("click", () => {
   order.clear();
-  rewardMessage.textContent = "Order cleared. Saved points stayed safe.";
+  rewardMessage.textContent = hasAccount()
+    ? `Order cleared. ${activeAccount}'s saved points stayed safe.`
+    : "Order cleared.";
   updateOrderPanel();
 });
 
@@ -196,3 +255,10 @@ freeSnackButton.addEventListener("click", () => {
 });
 
 updateOrderPanel();
+
+if (hasAccount()) {
+  studentNameInput.value = activeAccount;
+  accountMessage.textContent = `Account ready for ${activeAccount}. These points are personal.`;
+  rewardMessage.textContent = `${activeAccount}, your saved points are loaded.`;
+  updateOrderPanel();
+}
