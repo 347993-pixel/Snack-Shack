@@ -250,11 +250,10 @@ function saveOrderPoints() {
   setSavedPoints(getSavedPoints() + points);
   order.clear();
   rewardMessage.textContent = `${points} eco points saved for student ID #${activeStudentId}. Thanks for choosing greener packaging.`;
-  showPointsAlert("Points saved", `${points} points were saved for student ID #${activeStudentId}.`);
   updateOrderPanel();
 }
 
-function spendPoints(cost, message) {
+function spendPoints(cost, message, alertTitle, alertText) {
   const points = getSavedPoints();
 
   if (points < cost) {
@@ -263,7 +262,7 @@ function spendPoints(cost, message) {
 
   setSavedPoints(points - cost);
   rewardMessage.textContent = message;
-  showPointsAlert("Points used", `${cost} points were used. You have ${getSavedPoints()} points left.`);
+  showPointsAlert(alertTitle, alertText);
   updateRewardButtons();
 }
 
@@ -291,11 +290,21 @@ savePointsButton.addEventListener("click", saveOrderPoints);
 
 mysteryDrawButton.addEventListener("click", () => {
   const prize = mysteryPrizes[Math.floor(Math.random() * mysteryPrizes.length)];
-  spendPoints(100, `Mystery draw result: you won ${prize}.`);
+  spendPoints(
+    100,
+    `Mystery draw result: you won ${prize}.`,
+    "Mystery prize",
+    `You won ${prize}!`
+  );
 });
 
 freeSnackButton.addEventListener("click", () => {
-  spendPoints(200, "Reward redeemed: show Mia this message for one free snack.");
+  spendPoints(
+    200,
+    "Reward redeemed: show Mia this message for one free snack.",
+    "Free snack",
+    "You earned one free snack. Show Mia this message."
+  );
 });
 
 updateOrderPanel();
