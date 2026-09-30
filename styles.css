@@ -511,6 +511,44 @@ h1 {
   text-transform: uppercase;
 }
 
+.points-alert {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 20;
+  width: min(420px, calc(100% - 32px));
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  border: 6px solid var(--ink);
+  border-radius: 8px;
+  color: var(--ink);
+  background: linear-gradient(135deg, var(--yellow), #c9f7de);
+  box-shadow: 10px 10px 0 rgba(18, 18, 18, 0.55);
+  text-align: center;
+  transform: translate(-50%, -50%) scale(0.86);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.points-alert.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.points-alert strong {
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", Arial, sans-serif;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.points-alert span {
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
 @media (max-width: 920px) {
   .shop-layout {
     grid-template-columns: 1fr;

@@ -13,6 +13,9 @@ const savedPoints = document.querySelector("#savedPoints");
 const rewardMessage = document.querySelector("#rewardMessage");
 const orderItems = document.querySelector("#orderItems");
 const snackBag = document.querySelector("#snackBag");
+const pointsAlert = document.querySelector("#pointsAlert");
+const pointsAlertTitle = document.querySelector("#pointsAlertTitle");
+const pointsAlertText = document.querySelector("#pointsAlertText");
 
 const order = new Map();
 const activeAccountKey = "snackShackActiveStudentId";
@@ -26,6 +29,7 @@ const mysteryPrizes = [
   "a thank-you note from The Snack Shack"
 ];
 let activeStudentId = loadActiveStudentId();
+let pointsAlertTimer;
 
 function money(value) {
   return `$${value.toFixed(2)}`;
@@ -79,6 +83,19 @@ function setSavedPoints(points) {
   }
 
   localStorage.setItem(getAccountKey(), String(Math.max(points, 0)));
+}
+
+function showPointsAlert(title, message) {
+  pointsAlertTitle.textContent = title;
+  pointsAlertText.textContent = message;
+  pointsAlert.setAttribute("aria-hidden", "false");
+  pointsAlert.classList.add("show");
+  clearTimeout(pointsAlertTimer);
+
+  pointsAlertTimer = setTimeout(() => {
+    pointsAlert.classList.remove("show");
+    pointsAlert.setAttribute("aria-hidden", "true");
+  }, 3200);
 }
 
 function getOrderTotal() {
@@ -233,6 +250,7 @@ function saveOrderPoints() {
   setSavedPoints(getSavedPoints() + points);
   order.clear();
   rewardMessage.textContent = `${points} eco points saved for student ID #${activeStudentId}. Thanks for choosing greener packaging.`;
+  showPointsAlert("Points saved", `${points} points were saved for student ID #${activeStudentId}.`);
   updateOrderPanel();
 }
 
@@ -245,6 +263,7 @@ function spendPoints(cost, message) {
 
   setSavedPoints(points - cost);
   rewardMessage.textContent = message;
+  showPointsAlert("Points used", `${cost} points were used. You have ${getSavedPoints()} points left.`);
   updateRewardButtons();
 }
 
