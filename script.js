@@ -1,6 +1,5 @@
 const snackCards = document.querySelectorAll(".snack-card");
 const accountForm = document.querySelector("#accountForm");
-const studentNameInput = document.querySelector("#studentName");
 const studentIdInput = document.querySelector("#studentId");
 const accountMessage = document.querySelector("#accountMessage");
 const clearButton = document.querySelector("#clearOrder");
@@ -16,7 +15,8 @@ const orderItems = document.querySelector("#orderItems");
 const snackBag = document.querySelector("#snackBag");
 
 const order = new Map();
-const activeAccountKey = "snackShackActiveAccount";
+const activeAccountKey = "snackShackActiveStudentId";
+const oldActiveAccountKey = "snackShackActiveAccount";
 const rewardsPrefix = "snackShackEcoPoints:";
 const mysteryPrizes = [
   "a bonus sticker",
@@ -25,46 +25,44 @@ const mysteryPrizes = [
   "a free mystery topping",
   "a thank-you note from The Snack Shack"
 ];
-let activeAccount = loadActiveAccount();
+let activeStudentId = loadActiveStudentId();
 
 function money(value) {
   return `$${value.toFixed(2)}`;
-}
-
-function cleanName(name) {
-  return name.trim().replace(/\s+/g, " ");
 }
 
 function cleanId(id) {
   return id.trim().replace(/\s+/g, "");
 }
 
-function loadActiveAccount() {
-  const saved = localStorage.getItem(activeAccountKey);
+function loadActiveStudentId() {
+  const savedId = localStorage.getItem(activeAccountKey);
 
-  if (!saved) {
-    return null;
+  if (savedId) {
+    return savedId;
   }
+
+  const oldSavedAccount = localStorage.getItem(oldActiveAccountKey);
 
   try {
-    const account = JSON.parse(saved);
+    const account = JSON.parse(oldSavedAccount);
 
-    if (account && account.name && account.id) {
-      return account;
+    if (account && account.id) {
+      return account.id;
     }
   } catch (error) {
-    return null;
+    return "";
   }
 
-  return null;
+  return "";
 }
 
 function getAccountKey() {
-  return `${rewardsPrefix}${activeAccount.id}`;
+  return `${rewardsPrefix}${activeStudentId}`;
 }
 
 function hasAccount() {
-  return Boolean(activeAccount && activeAccount.id);
+  return activeStudentId.length > 0;
 }
 
 function getSavedPoints() {
@@ -124,8 +122,8 @@ function updateOrderPanel() {
   if (order.size === 0) {
     orderItems.innerHTML = hasAccount()
       ? '<p class="empty-order">Tap snacks to add them here.</p>'
-      : '<p class="empty-order">Enter your name first, then tap snacks.</p>';
-    snackBag.textContent = hasAccount() ? "Pay Mia in person" : "Start with your name";
+      : '<p class="empty-order">Enter your student ID first, then tap snacks.</p>';
+    snackBag.textContent = hasAccount() ? "Pay Mia in person" : "Start with your ID";
     updateRewardButtons();
     return;
   }
@@ -167,33 +165,28 @@ function updateOrderPanel() {
   updateRewardButtons();
 }
 
-function setActiveAccount(name, id) {
-  const cleanAccountName = cleanName(name);
+function setActiveAccount(id) {
   const cleanAccountId = cleanId(id);
 
-  if (!cleanAccountName || !cleanAccountId) {
+  if (!cleanAccountId) {
     return false;
   }
 
-  activeAccount = {
-    name: cleanAccountName,
-    id: cleanAccountId
-  };
+  activeStudentId = cleanAccountId;
 
-  localStorage.setItem(activeAccountKey, JSON.stringify(activeAccount));
-  studentNameInput.value = activeAccount.name;
-  studentIdInput.value = activeAccount.id;
-  accountMessage.textContent = `Account ready for ${activeAccount.name} (#${activeAccount.id}). These points are personal.`;
-  rewardMessage.textContent = `${activeAccount.name}, choose snacks to earn your own eco points.`;
+  localStorage.setItem(activeAccountKey, activeStudentId);
+  studentIdInput.value = activeStudentId;
+  accountMessage.textContent = `Account ready for student ID #${activeStudentId}. These points are personal.`;
+  rewardMessage.textContent = `Student ID #${activeStudentId}, choose snacks to earn your own eco points.`;
   updateOrderPanel();
   return true;
 }
 
 function addSnack(card) {
   if (!hasAccount()) {
-    rewardMessage.textContent = "Please enter your name and student ID before buying snacks.";
+    rewardMessage.textContent = "Please enter your student ID before buying snacks.";
     accountMessage.textContent = "Your student ID is needed so points do not mix with other students.";
-    studentNameInput.focus();
+    studentIdInput.focus();
     return;
   }
 
@@ -239,7 +232,7 @@ function saveOrderPoints() {
 
   setSavedPoints(getSavedPoints() + points);
   order.clear();
-  rewardMessage.textContent = `${points} eco points saved for ${activeAccount.name}. Thanks for choosing greener packaging.`;
+  rewardMessage.textContent = `${points} eco points saved for student ID #${activeStudentId}. Thanks for choosing greener packaging.`;
   updateOrderPanel();
 }
 
@@ -262,15 +255,15 @@ snackCards.forEach((card) => {
 accountForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  if (!setActiveAccount(studentNameInput.value, studentIdInput.value)) {
-    accountMessage.textContent = "Please type your name and student ID to start a personal points account.";
+  if (!setActiveAccount(studentIdInput.value)) {
+    accountMessage.textContent = "Please type your student ID to start a personal points account.";
   }
 });
 
 clearButton.addEventListener("click", () => {
   order.clear();
   rewardMessage.textContent = hasAccount()
-    ? `Order cleared. ${activeAccount.name}'s saved points stayed safe.`
+    ? `Order cleared. Student ID #${activeStudentId}'s saved points stayed safe.`
     : "Order cleared.";
   updateOrderPanel();
 });
@@ -289,9 +282,8 @@ freeSnackButton.addEventListener("click", () => {
 updateOrderPanel();
 
 if (hasAccount()) {
-  studentNameInput.value = activeAccount.name;
-  studentIdInput.value = activeAccount.id;
-  accountMessage.textContent = `Account ready for ${activeAccount.name} (#${activeAccount.id}). These points are personal.`;
-  rewardMessage.textContent = `${activeAccount.name}, your saved points are loaded.`;
+  studentIdInput.value = activeStudentId;
+  accountMessage.textContent = `Account ready for student ID #${activeStudentId}. These points are personal.`;
+  rewardMessage.textContent = `Student ID #${activeStudentId}, your saved points are loaded.`;
   updateOrderPanel();
 }
