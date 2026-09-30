@@ -136,7 +136,7 @@ function updateOrderPanel() {
 
     const label = document.createElement("div");
     label.className = "order-name";
-    label.innerHTML = `<span>${name}</span><small>${money(item.price)} each</small><em>${item.packaging} +${item.points} pts each</em>`;
+    label.innerHTML = `<span>${name}</span><small>${money(item.price)} each</small><em>+${item.points} points each</em>`;
 
     const controls = document.createElement("div");
     controls.className = "quantity-controls";
@@ -203,7 +203,7 @@ function addSnack(card) {
     quantity: current ? current.quantity + 1 : 1
   });
 
-  rewardMessage.textContent = `${name} added. Green packaging earns ${points} points.`;
+  rewardMessage.textContent = `${name} added. This snack earns ${points} points.`;
   updateOrderPanel();
 }
 
